@@ -13,7 +13,8 @@ class CreateMarkdown:
     """ Create GitHub Markdown """
 
     def __init__(self):
-        self.url = 'https://github.com/AlienegraGeek/pyire'
+        # self.url = 'https://github.com/AlienegraGeek/pyire'
+        self.url = 'https://tdirectory.me/search/basketball#groups'
         self.template_file = '_template.md'
 
     def readme_handler(self):
