@@ -31,37 +31,15 @@ def evm_data_driver():
         )
         # page source
         page_content = driver.page_source
-        embedded_html_match = re.search(r'(<tr class="text-left border-b-2 text-md dark:text-white border-b-stone-800">.*?</tr>)', page_content, re.DOTALL)
-        if embedded_html_match:
-            embedded_html = embedded_html_match.group(1)
+        # soup = BeautifulSoup(page_content, 'html.parser')
+        root_element = driver.find_element(By.ID, "root")
+        data_elements = root_element.find_elements(By.XPATH, ".//*")
+        h1_elements = root_element.find_elements(By.CSS_SELECTOR,
+                                                 "h1.text-2xl.font-bold.text-blue-600.uppercase.dark\\:text-blue-400")
+        h1_elements = driver.find_elements(By.CSS_SELECTOR, "h1")
+        for tr in h1_elements:
+            rprint(tr.text)
 
-            # 使用 BeautifulSoup 解析提取出的 HTML 字符串
-            soup = BeautifulSoup(embedded_html, 'html.parser')
-
-            # 查找并打印 h1 标签
-            h1_elements = soup.find_all("h1", class_="text-2xl font-bold text-blue-600 uppercase dark:text-blue-400")
-            for h1 in h1_elements:
-                print(h1.text)
-
-            # 查找并打印 tr 和 td 标签内容
-            tr_elements = soup.find_all("tr", class_="text-left border-b-2 text-md dark:text-white border-b-stone-800")
-            for tr in tr_elements:
-                print(tr.text)
-
-            td_elements = soup.find_all("td", class_="px-2 py-4")
-            for td in td_elements:
-                print(td.text)
-            # soup = BeautifulSoup(page_content, 'html.parser')
-            # root_element = driver.find_element(By.ID, "root")
-            # data_elements = root_element.find_elements(By.XPATH, ".//*")
-            inner_groups = []
-            # for group in soup.find_all('div', class_='text-2xl font-bold text-blue-600 uppercase dark:text-blue-400'):
-            # for group in soup.find_all('div', class_='w-full overflow-x-auto rounded-t-3xl'):
-            # 查找所有具有特定类名的 <tr> 元素
-            # h1_elements = root_element.find_elements(By.CSS_SELECTOR, "h1.text-2xl.font-bold.text-blue-600.uppercase.dark\\:text-blue-400")
-            # h1_elements = driver.find_elements(By.CSS_SELECTOR, "h1")
-            # for tr in h1_elements:
-            #     rprint(tr.text)
     finally:
         driver.quit()
 

@@ -14,7 +14,7 @@ class CreateMarkdown:
 
     def __init__(self):
         # self.url = 'https://github.com/AlienegraGeek/pyire'
-        self.url = 'https://tdirectory.me/search/basketball#groups'
+        self.url = f'https://tdirectory.me/search/geopolitics/#groups'
         self.template_file = '../_template.md'
 
     def readme_handler(self):
@@ -104,7 +104,7 @@ class CreateMarkdown:
             output_file.write(rendered_file)
             output_file.close()
 
-    def shuffle(self, generator):
+    def shuffle(generator):
         lst = list(generator)
         lst = list(set(lst))
         random.shuffle(lst)
