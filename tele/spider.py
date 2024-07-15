@@ -15,7 +15,7 @@ class CreateMarkdown:
     def __init__(self):
         # self.url = 'https://github.com/AlienegraGeek/pyire'
         self.url = 'https://tdirectory.me/search/basketball#groups'
-        self.template_file = '_template.md'
+        self.template_file = '../_template.md'
 
     def readme_handler(self):
         readme_url = posixpath.join(self.url, "blob/main/README.md")
@@ -97,10 +97,10 @@ class CreateMarkdown:
             }
 
     def create_md(self, repo):
-        with open('_template.md', 'r', encoding='utf-8') as file:
+        with open('../_template.md', 'r', encoding='utf-8') as file:
             template = Template(file.read(), trim_blocks=True)
             rendered_file = template.render(repo=repo)
-            output_file = codecs.open("README.md", "w", "utf-8")
+            output_file = codecs.open("../README.md", "w", "utf-8")
             output_file.write(rendered_file)
             output_file.close()
 
