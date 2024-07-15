@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 import json
-import sys
 import logging
 from rich.logging import RichHandler
 from rich import print as rprint
