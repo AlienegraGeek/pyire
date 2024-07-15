@@ -33,26 +33,7 @@ def search_telegram_chat_groups(keyword):
     return inner_groups
 
 
-def search_telegram_chat_groups2(keyword):
-    url = f'https://telegramchannels.me/?s={keyword}'
-    response = requests.get(url)
-    if response.status_code != 200:
-        rprint(f"Failed to retrieve data: {response.status_code}")
-        return []
 
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    groups = []
-    for group in soup.find_all('div', class_='featured-channel'):
-        title = group.find('div', class_='featured-channel-title').text.strip()
-        link = group.find('a', class_='btn')['href']
-        description = group.find('div', class_='featured-channel-description').text.strip()
-        groups.append({
-            'title': title,
-            'link': link,
-            'description': description
-        })
-    return groups
 
 
 def transform_link(link):

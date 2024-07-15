@@ -11,8 +11,19 @@
 
 | 名称 | 简介 | 人数 | 类型 |
 | :--: | :-- | :--: | :--: |
-{% for item in repo %}
+
+[//]: # ({% for item in repo %})
+
+[//]: # ()
 | [{{item.tg_me_page_title}}]({{item.tg_me_page_url}}) | {{item.tg_me_page_description}} | {{item.tg_me_audience}} | {{item.tg_me_category}} |
+
+[//]: # ()
+[//]: # ({% endfor %})
+
+{% for group in groups %}
+
+| [{{group.title}}]({{group.link}}) | {{group.description}} | {{group.description}} | {{group.description}} |
+
 {% endfor %}
 
 ## 免责声明

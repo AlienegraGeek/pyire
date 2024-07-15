@@ -5,8 +5,11 @@ from itertools import chain
 from urllib.parse import urljoin
 import random
 import requests
+from bs4 import BeautifulSoup
 from jinja2 import Template
 from lxml import etree
+from tele.search import search_telegram_chat_groups
+from tele.search import transform_link
 
 
 class CreateMarkdown:
@@ -15,11 +18,15 @@ class CreateMarkdown:
     def __init__(self):
         # self.url = 'https://github.com/AlienegraGeek/pyire'
         self.url = f'https://tdirectory.me/search/geopolitics/#groups'
-        self.template_file = '../_template.md'
+        # self.url = 'https://github.com/jackhawks/rectg'
+        self.template_file = '_template.md'
 
     def readme_handler(self):
         readme_url = posixpath.join(self.url, "blob/main/README.md")
         response = requests.get(readme_url)
+        if response.status_code != 200:
+            print(f"Failed to fetch README: {response.status_code}")
+            return
         html = etree.HTML(response.text)
         elements = html.xpath('//*[contains(@href,"t.me")]/@href')
         for element in elements:
@@ -28,6 +35,9 @@ class CreateMarkdown:
     def issues_handler(self):
         issues_url = posixpath.join(self.url, "issues")
         response = requests.get(issues_url)
+        if response.status_code != 200:
+            print(f"Failed to fetch issues: {response.status_code}")
+            return
         html = etree.HTML(response.text)
         elements = html.xpath("//div[contains(@role,'group')]//a[contains(@id,'issue_')]/@href")
         for element in elements:
@@ -42,10 +52,11 @@ class CreateMarkdown:
 
     def get_info(self, urls):
         for idx, url in enumerate(urls):
-
             print(idx, ' ---> ', url)
-
             response = requests.get(url)
+            if response.status_code != 200:
+                print(f"Failed to fetch URL: {url} with status code {response.status_code}")
+                continue
             html = etree.HTML(response.text)
 
             tg_me_page_url = url
@@ -72,7 +83,8 @@ class CreateMarkdown:
 
                 tg_me_page_description = tg_me_page_description_raw.replace('|', '')
 
-            except:
+            except Exception as e:
+                print(f"Error fetching description: {e}")
                 tg_me_page_description = None
 
             # 数据处理
@@ -96,27 +108,87 @@ class CreateMarkdown:
                 'tg_me_category': tg_me_category,
             }
 
-    def create_md(self, repo):
-        with open('../_template.md', 'r', encoding='utf-8') as file:
+    # def create_md(self, repo):
+    #     if not repo:
+    #         print("No data to create markdown.")
+    #         return
+    #     with open('_template.md', 'r', encoding='utf-8') as file:
+    #         template = Template(file.read(), trim_blocks=True)
+    #         rendered_file = template.render(repo=repo)
+    #         output_file = codecs.open("README.md", "w", "utf-8")
+    #         output_file.write(rendered_file)
+    #         output_file.close()
+    #     print("Markdown file created successfully.")
+
+    def create_md(self, groups):
+        with open(self.template_file, 'r', encoding='utf-8') as file:
             template = Template(file.read(), trim_blocks=True)
-            rendered_file = template.render(repo=repo)
-            output_file = codecs.open("../README.md", "w", "utf-8")
+            rendered_file = template.render(groups=groups)
+            output_file = codecs.open("README.md", "w", "utf-8")
             output_file.write(rendered_file)
             output_file.close()
+        print("Markdown file created successfully.")
 
-    def shuffle(generator):
+    def shuffle(self, generator):
         lst = list(generator)
         lst = list(set(lst))
         random.shuffle(lst)
         return (y for y in lst)
 
+    def search_telegram_chat_groups(self, keyword):
+        url = f'https://tdirectory.me/search/{keyword}#groups'
+        response = requests.get(url)
+        if response.status_code != 200:
+            # rprint(f"Failed to retrieve data: {response.status_code}")
+            return []
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        inner_groups = []
+        for group in soup.find_all('div', class_='col-md-3 col-sm-6 col-xs-12 item-div'):
+            title = group.find('h4').text.strip()
+            link = group.find('a')['href']
+            description = group.find('p').text.strip()
+            inner_groups.append({
+                'title': title,
+                'link': link,
+                'description': description
+            })
+        return inner_groups
+
+    def transform_link(self, link):
+        base_url = "https://telegram.me/"
+        if link.startswith("/group/"):
+            username = link.split("/group/")[1].split(".")[0]
+            return urljoin(base_url, username)
+        elif link.startswith("/channel/"):
+            return None
+        return link
+
+    def search_group(self, keyword):
+        groups = self.search_telegram_chat_groups(keyword)
+        transformed_groups = []
+        for group in groups:
+            new_link = self.transform_link(group['link'])
+            group['link'] = self.transform_link(group['link'])
+            if new_link:
+                group['link'] = new_link
+                transformed_groups.append(group)
+        # console = Console()
+        # rprint(json.dumps(transformed_groups, indent=2))
+        return transformed_groups
+
     def start(self):
-        issues = self.issues_handler()
-        readme = self.readme_handler()
-        urls = self.url_join(issues, readme)
-        suf = self.shuffle(urls)
-        info = self.get_info(suf)
-        self.create_md(info)
+        # issues = self.issues_handler()
+        # readme = self.readme_handler()
+        # urls = self.url_join(issues, readme)
+        # suf = self.shuffle(urls)
+        # info = self.get_info(suf)
+        # if not info:
+        #     print("No information fetched.")
+        # self.create_md(info)
+        keyword = "geopolitics"  # 这里可以改成你需要搜索的关键字
+        groups = self.search_group(keyword)
+        self.create_md(groups)
 
 
 if __name__ == '__main__':
