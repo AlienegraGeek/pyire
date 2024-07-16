@@ -1,4 +1,4 @@
-# 【热门推荐】5000+ 优质 Telegram 群组、频道和机器人，精心筛选，助您迅速找到最佳选择！
+# 【热门推荐】优质 Telegram 群组、频道和机器人，精心筛选，助您迅速找到最佳选择！
 
 > **Note**
 > 声明：本项目的所有内容均来源于网络，仅供学习和技术研究使用。
@@ -11,19 +11,8 @@
 
 | 名称 | 简介 | 人数 | 类型 |
 | :--: | :-- | :--: | :--: |
-
-[//]: # ({% for item in repo %})
-
-[//]: # ()
-| [{{item.tg_me_page_title}}]({{item.tg_me_page_url}}) | {{item.tg_me_page_description}} | {{item.tg_me_audience}} | {{item.tg_me_category}} |
-
-[//]: # ()
-[//]: # ({% endfor %})
-
 {% for group in groups %}
-
-| [{{group.title}}]({{group.link}}) | {{group.description}} | {{group.description}} | {{group.description}} |
-
+| [{{group.title}}]({{group.link}}) | {{group.description}} | {{group.members}} | {{group.keyword}} |
 {% endfor %}
 
 ## 免责声明

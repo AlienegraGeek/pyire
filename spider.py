@@ -16,9 +16,7 @@ class CreateMarkdown:
     """ Create GitHub Markdown """
 
     def __init__(self):
-        # self.url = 'https://github.com/AlienegraGeek/pyire'
-        self.url = f'https://tdirectory.me/search/geopolitics/#groups'
-        # self.url = 'https://github.com/jackhawks/rectg'
+        self.url = 'https://github.com/AlienegraGeek/pyire'
         self.template_file = '_template.md'
 
     def readme_handler(self):
@@ -136,7 +134,7 @@ class CreateMarkdown:
         return (y for y in lst)
 
     def search_telegram_chat_groups(self, keyword):
-        url = f'https://tdirectory.me/search/{keyword}#groups'
+        url = 'https://github.com/AlienegraGeek/pyire'
         response = requests.get(url)
         if response.status_code != 200:
             # rprint(f"Failed to retrieve data: {response.status_code}")
@@ -147,11 +145,18 @@ class CreateMarkdown:
         for group in soup.find_all('div', class_='col-md-3 col-sm-6 col-xs-12 item-div'):
             title = group.find('h4').text.strip()
             link = group.find('a')['href']
-            description = group.find('p').text.strip()
+            description_tag = group.find_all('p')[1] if len(group.find_all('p')) > 1 else None
+            description = description_tag.get_text(separator=' ', strip=True) if description_tag else ""
+            members_tag = group.find('i', class_='fa fa-group item-icon')
+            members_text = members_tag.find_parent().text if members_tag else ""
+            members_match = re.search(r'(\d[\d,]*)', members_text)
+            members = members_match.group(1) if members_match else "N/A"
             inner_groups.append({
-                'title': title,
-                'link': link,
-                'description': description
+                'title': self.escape_markdown(title),
+                'link': self.escape_markdown(link),
+                'description': self.escape_markdown(description),
+                'members': self.escape_markdown(members),
+                'keyword': self.escape_markdown(keyword),
             })
         return inner_groups
 
@@ -163,6 +168,9 @@ class CreateMarkdown:
         elif link.startswith("/channel/"):
             return None
         return link
+
+    def escape_markdown(self, text):
+        return text.replace('|', '\\|')
 
     def search_group(self, keyword):
         groups = self.search_telegram_chat_groups(keyword)

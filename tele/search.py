@@ -1,3 +1,5 @@
+import re
+
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -12,8 +14,7 @@ logger = logging.getLogger("rich")
 
 
 def search_telegram_chat_groups(keyword):
-    url = f'https://tdirectory.me/search/{keyword}#groups'
-    # url = f'https://tdirectory.me/search/geopolitics#groups'
+    url = 'https://github.com/AlienegraGeek/pyire'
     response = requests.get(url)
     if response.status_code != 200:
         rprint(f"Failed to retrieve data: {response.status_code}")
@@ -24,16 +25,21 @@ def search_telegram_chat_groups(keyword):
     for group in soup.find_all('div', class_='col-md-3 col-sm-6 col-xs-12 item-div'):
         title = group.find('h4').text.strip()
         link = group.find('a')['href']
-        description = group.find('p').text.strip()
+        # description = group.find('p').text.strip()
+        description_tag = group.find_all('p')[1] if len(group.find_all('p')) > 1 else None
+        description = description_tag.get_text(strip=True) if description_tag else ""
+        members_tag = group.find('i', class_='fa fa-group item-icon')
+        members_text = members_tag.find_parent().text if members_tag else ""
+        members_match = re.search(r'(\d[\d,]*)', members_text)
+        members = members_match.group(1) if members_match else "N/A"
         inner_groups.append({
             'title': title,
             'link': link,
-            'description': description
+            'description': description,
+            'members': members,
+            'keyword': keyword
         })
     return inner_groups
-
-
-
 
 
 def transform_link(link):
