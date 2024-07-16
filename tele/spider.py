@@ -8,8 +8,6 @@ import requests
 from bs4 import BeautifulSoup
 from jinja2 import Template
 from lxml import etree
-from tele.search import search_telegram_chat_groups
-from tele.search import transform_link
 
 
 class CreateMarkdown:
@@ -17,7 +15,7 @@ class CreateMarkdown:
 
     def __init__(self):
         self.url = 'https://github.com/AlienegraGeek/pyire'
-        self.template_file = '_template.md'
+        self.template_file = '../_template.md'
 
     def readme_handler(self):
         readme_url = posixpath.join(self.url, "blob/main/README.md")
@@ -122,7 +120,7 @@ class CreateMarkdown:
         with open(self.template_file, 'r', encoding='utf-8') as file:
             template = Template(file.read(), trim_blocks=True)
             rendered_file = template.render(groups=groups)
-            output_file = codecs.open("README.md", "w", "utf-8")
+            output_file = codecs.open("../README.md", "w", "utf-8")
             output_file.write(rendered_file)
             output_file.close()
         print("Markdown file created successfully.")
@@ -194,7 +192,7 @@ class CreateMarkdown:
         # if not info:
         #     print("No information fetched.")
         # self.create_md(info)
-        keyword = "geopolitics"  # 这里可以改成你需要搜索的关键字
+        keyword = "geopolitics"
         groups = self.search_group(keyword)
         self.create_md(groups)
 
