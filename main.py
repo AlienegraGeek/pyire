@@ -1,6 +1,7 @@
 import logging
 from rich.logging import RichHandler
 from tele.search import search_group
+from tele.search import search_teleteg_group
 from chain.evm import search_evm_data
 from chain.evm_driver import evm_data_driver
 from chain.evm_driver import baidu_driver
@@ -15,7 +16,8 @@ logger = logging.getLogger("rich")
 
 
 def main():
-    search_group('geopolitics')
+    # search_group('geopolitics')
+    search_teleteg_group('political')
     # search_evm_data('0xf6372ef94026f71e5e48f0ff2ff5ceb06fdff303')
     # evm_data_driver()
     # baidu_driver()

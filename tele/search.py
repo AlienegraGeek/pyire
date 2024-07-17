@@ -1,3 +1,4 @@
+import codecs
 import re
 
 import requests
@@ -65,3 +66,48 @@ def search_group(keyword):
     console = Console()
     # console.print_json(json.dumps(groups))
     rprint(json.dumps(transformed_groups, indent=2))
+
+
+def search_teleteg_chat_groups(keyword):
+    url = f'https://teleteg.com/search-results/?query={keyword}&filters=groups'
+    response = requests.get(url)
+    if response.status_code != 200:
+        rprint(f"Failed to retrieve data: {response.status_code}")
+        return []
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    inner_groups = []
+    for group in soup.find_all('tr'):
+        a_tag = group.find('a')
+        link = a_tag['href'] if a_tag else None
+
+        td_tags = group.find_all('td')
+        if len(td_tags) > 3:
+            title = td_tags[1].get_text(strip=True)
+            title = decode_unicode_escape(title)
+            description = td_tags[2].get_text(strip=True)
+            description = decode_unicode_escape(description)
+            members = td_tags[3].get_text(strip=True)
+            inner_groups.append({
+                'title': title,
+                'link': link,
+                'description': description,
+                'members': members,
+                'keyword': keyword
+            })
+    return inner_groups
+
+
+def search_teleteg_group(keyword):
+    # keyword = sys.argv[1]
+    groups = search_teleteg_chat_groups(keyword)
+    # console.print_json(json.dumps(groups))
+    print(json.dumps(groups, indent=2))
+
+
+def decode_unicode_escape(text):
+    try:
+        return text.encode('utf-8').decode('unicode-escape').encode('latin1').decode('utf-8')
+    except Exception as e:
+        print(f"Decoding error: {e}")
+        return text
